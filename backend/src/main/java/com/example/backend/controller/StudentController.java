@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.jdbc.core.JdbcTemplate;
+import com.example.backend.service.StudentService;
 
 @RestController
 @RequestMapping("/students")
@@ -16,6 +17,8 @@ public class StudentController {
 
      @Autowired
     JdbcTemplate jdbcTemplate;
+        @Autowired
+    private StudentService service;
 
     @GetMapping
     public ArrayList<Student> getStudents() {
@@ -60,5 +63,9 @@ public class StudentController {
                 sql,
                 Integer.class
         );
+    }
+     @GetMapping("/message")
+    public String getMessage() {
+        return service.getMessage();
     }
 }
