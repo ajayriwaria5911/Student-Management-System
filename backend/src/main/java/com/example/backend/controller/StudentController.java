@@ -1,59 +1,52 @@
 package com.example.backend.controller;
 
 import com.example.backend.model.Student;
-import org.springframework.web.bind.annotation.*;
+import com.example.backend.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.jdbc.core.JdbcTemplate;
-import com.example.backend.service.StudentService;
 
 @RestController
 @RequestMapping("/students")
 @CrossOrigin("*")
 public class StudentController {
 
-     @Autowired
-    JdbcTemplate jdbcTemplate;
-        @Autowired
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
     private StudentService service;
 
+    // Get all students from database
     @GetMapping
-    public ArrayList<Student> getStudents() {
-
-        ArrayList<Student> students = new ArrayList<>();
-
-        students.add(new Student(1, "John", "Mca"));
-        students.add(new Student(2, "Tushar", "Bca"));
-        students.add(new Student(3, "Aman", "Bca"));
-        students.add(new Student(4, "Rahul", "Mca"));
-        students.add(new Student(5, "Ajay", "Mca"));
-
-        return students;
+    public List<Student> getStudents() {
+        return service.getAllStudents();
     }
 
-    // New API for BCA students
+    // Get only BCA students
     @GetMapping("/bca")
     public List<Student> getBcaStudents() {
 
-        return getStudents()
+        return service.getAllStudents()
                 .stream()
-                .filter(student -> "Bca".equals(student.getCourse()))
+                .filter(student -> "Bca".equalsIgnoreCase(student.getCourse()))
                 .collect(Collectors.toList());
     }
 
-    // New API for names only
+    // Get only names
     @GetMapping("/names")
     public List<String> getNames() {
 
-        return getStudents()
+        return service.getAllStudents()
                 .stream()
                 .map(Student::getName)
                 .collect(Collectors.toList());
     }
-    
+
+    // Count students in database
     @GetMapping("/count")
     public int countStudents() {
 
@@ -64,8 +57,15 @@ public class StudentController {
                 Integer.class
         );
     }
-     @GetMapping("/message")
-    public String getMessage() {
-        return service.getMessage();
-    }
+
+    // // Test service
+    // @GetMapping("/message")
+    // public String getMessage() {
+    //     return service.getMessage();
+    // }
+    @PostMapping
+public Student addStudent(@RequestBody Student student) {
+    return service.saveStudent(student);
+}
+    
 }
