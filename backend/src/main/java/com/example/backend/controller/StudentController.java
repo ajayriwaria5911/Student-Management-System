@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.StudentRequestDTO;
 import com.example.backend.dto.StudentResponseDTO;
 import com.example.backend.model.Student;
 import com.example.backend.service.StudentService;
@@ -33,8 +34,7 @@ public class StudentController {
     public List<Student> getBcaStudents() {
         return service.getAllStudents()
                 .stream()
-                .filter(student ->
-                        "Bca".equalsIgnoreCase(student.getCourse()))
+                .filter(student -> "Bca".equalsIgnoreCase(student.getCourse()))
                 .collect(Collectors.toList());
     }
 
@@ -50,51 +50,40 @@ public class StudentController {
     // Count students
     @GetMapping("/count")
     public int countStudents() {
-
         String sql = "SELECT COUNT(*) FROM students";
-
-        return jdbcTemplate.queryForObject(
-                sql,
-                Integer.class
-        );
-    }
-
-    // Add new student
-    @PostMapping
-    public Student addStudent(
-            @RequestBody Student student) {
-
-        return service.saveStudent(student);
+        return jdbcTemplate.queryForObject(sql, Integer.class);
     }
 
     // Get student by id
     @GetMapping("/{id}")
-    public ResponseEntity<StudentResponseDTO> getStudent(
-            @PathVariable Integer id) {
-
+    public ResponseEntity<StudentResponseDTO> getStudent(@PathVariable Integer id) {
         Student student = service.getStudentById(id);
 
-        StudentResponseDTO response =
-                new StudentResponseDTO(
-                        student.getId(),
-                        student.getName(),
-                        student.getCourse()
-                );
+        StudentResponseDTO response = new StudentResponseDTO(
+                student.getId(),
+                student.getName(),
+                student.getCourse()
+        );
 
         return ResponseEntity.ok(response);
     }
+
+    // Add new student
     @PostMapping
-public ResponseEntity<?> addStudent(@RequestBody StudentRequestDTO dto) {
+    public ResponseEntity<?> addStudent(@RequestBody StudentRequestDTO dto) {
+        Student student = service.addStudent(dto);
+        return ResponseEntity.ok(student);
+    }
 
-    Student student = service.addStudent(dto);
+    // Update existing student
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateStudent(@PathVariable Integer id, @RequestBody StudentRequestDTO dto) {
+        return ResponseEntity.ok(service.updateStudent(id, dto));
+    }
 
-    return ResponseEntity.ok(student);
-}
-@PutMapping("/{id}")
-public ResponseEntity<?> updateStudent(@PathVariable Integer id, @RequestBody StudentRequestDTO dto) {
-
-    return ResponseEntity.ok(
-            service.updateStudent(id,dto)
-    );
-}
+    // Delete student
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteStudent(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.deleteStudent(id));
+    }
 }

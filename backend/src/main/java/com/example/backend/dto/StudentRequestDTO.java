@@ -1,4 +1,4 @@
-package com.example.sms.dto;
+package com.example.backend.dto;
 
 public class StudentRequestDTO {
 
@@ -6,6 +6,11 @@ public class StudentRequestDTO {
     private String course;
 
     public StudentRequestDTO() {
+    }
+
+    public StudentRequestDTO(String name, String course) {
+        this.name = name;
+        this.course = course;
     }
 
     public String getName() {
