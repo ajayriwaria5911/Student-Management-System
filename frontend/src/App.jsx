@@ -1,14 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import StudentCard from "./components/StudentCard";
+import StudentForm from "./components/StudentForm";
 
 function App() {
 
   const [students, setStudents] = useState([]);
+  const fetchStudents = async () => {
+    const token =
+      "your_token";
 
-  const getStudents = async () => {
-
-    const response = await fetch(
-      "http://localhost:8080/students/bca"
-    );
+    const response = await fetch("http://localhost:8080/students", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
     const data = await response.json();
 
@@ -16,22 +23,29 @@ function App() {
   };
 
   useEffect(() => {
-    getStudents();
+    fetchStudents();
   }, []);
 
   return (
-    <div style={{ padding: "40px" }}>
+    <div
+      style={{
+        padding: "20px",
+      }}
+    >
+      <h1>Student Management System</h1>
 
-      <h1>BCA Students</h1>
+      <StudentForm refreshStudents={fetchStudents} />
 
-      {
-        students.map(student => (
-          <div key={student.id}>
-            <h3>{student.name}</h3>
-          </div>
-        ))
-      }
+      <hr />
 
+      {students.map((student) => (
+        <StudentCard
+          key={student.id}
+          name={student.name}
+          course={student.course}
+          email={student.email}
+        />
+      ))}
     </div>
   );
 }
